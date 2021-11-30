@@ -1,0 +1,27 @@
+/* Title slide */
+.title-slide {
+  text-align: left !important;
+  padding-left: 110px;
+}
+
+/* Title */
+.title-slide h1 {
+  color: var(--header-color);
+  font-size: 46px;
+  margin: 42px 0px 42px 0px
+}
+
+.title-slide h2 {
+  font-size: 36px;
+  margin: 18px 0px 18px 0px
+}
+
+.title-slide h3 {
+  font-size: 26px;
+  margin: 8px 0px 8px 0px
+}
+
+.title-slide h2,
+.title-slide h3 {
+  color: var(--text-color);
+}
