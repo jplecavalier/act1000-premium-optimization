@@ -1,0 +1,97 @@
+---
+title: "Optimisation de la prime"
+subtitle: "ACT-1000"
+author: "J.P. Le Cavalier"
+institute: "Promutuel Assurance"
+date: "3 décembre 2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(xaringanthemer)
+library(ggplot2)
+library(patchwork)
+library(showtext)
+library(scales)
+library(data.table)
+
+set.seed(20211203L)
+
+options(htmltools.dir.version = FALSE)
+opts_chunk$set(
+  fig.width = 15,
+  fig.height = 100/15,
+  fig.retina = 3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  fig.show = TRUE,
+  fig.align = "center",
+  hiline = TRUE,
+  dev.args = list(bg = "transparent")
+)
+
+style_duo(
+  primary_color = "#53565A",
+  secondary_color = "#FDDB00",
+  title_slide_text_color = "#53565A",
+  title_slide_background_color = "#FDDB00"
+)
+
+font_add_google(gsub("'", '', theme_xaringan_get_value("header_font_family")))
+font_add_google(gsub("'", '', theme_xaringan_get_value("text_font_family")))
+
+theme_set(
+  theme_minimal(
+    base_size = 10L,
+    base_family = gsub("'", '', theme_xaringan_get_value("text_font_family"))
+  ) +
+    theme(
+      text = element_text(
+        color = theme_xaringan_get_value("text_color")
+      ),
+      title = element_text(
+        family = gsub("'", '', theme_xaringan_get_value("header_font_family")),
+        color = theme_xaringan_get_value("header_color")
+      ),
+      line = element_line(
+        color = lighten_color(theme_xaringan_get_value("background_color"), 0.1)
+      ),
+      plot.title = element_text(
+        size = rel(1.5),
+        hjust = 0.5,
+        margin = margin(0, 0, 20, 0)
+      ),
+      axis.text = NULL,
+      panel.grid = NULL,
+      legend.position = "bottom"
+    )
+)
+
+update_geom_defaults("text", list(
+  family = theme_get()$text$family
+))
+update_geom_defaults("label", list(
+  family = theme_get()$text$family
+))
+update_geom_defaults("col", list(
+  fill = theme_xaringan_get_value("text_bold_color")
+))
+update_geom_defaults("point", list(
+  color = theme_xaringan_get_value("text_color")
+))
+update_geom_defaults("line", list(
+  color = theme_xaringan_get_value("text_color")
+))
+```
