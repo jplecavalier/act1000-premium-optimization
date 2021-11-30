@@ -1,4 +1,13 @@
+# R
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# HTML/CSS
+libs/
+*.html
+*.css
+
+# System
+*.DS_Store
