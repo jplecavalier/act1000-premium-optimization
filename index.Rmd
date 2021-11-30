@@ -44,7 +44,7 @@ opts_chunk$set(
 style_duo(
   primary_color = "#53565A",
   secondary_color = "#FDDB00",
-  title_slide_background_image = "logo.png",
+  title_slide_background_image = "logo.svg",
   title_slide_background_size = "320px",
   title_slide_background_position = "10% 90%",
   text_font_google = google_font("Roboto"),
