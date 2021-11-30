@@ -17,6 +17,8 @@ exécuter la commande suivante dans la console R :
 rmarkdown::render("index.Rmd")
 ```
 
+---
+
 Le matériel de ce dépôt est soumis à la licence
 [Creative Commons Attribution-ShareAlike 4.0 International][cc-by-sa].
 
