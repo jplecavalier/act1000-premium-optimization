@@ -6,8 +6,8 @@
 
 # HTML/CSS
 libs/
-*.html
-*.css
+index.html
+xaringan-themer.css
 
 # System
 *.DS_Store
