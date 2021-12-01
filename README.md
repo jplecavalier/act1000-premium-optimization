@@ -17,6 +17,10 @@ exécuter la commande suivante dans la console R :
 rmarkdown::render("index.Rmd")
 ```
 
+Prendre note que les polices de caractères [Roboto](https://fonts.google.com/specimen/Roboto) et
+[Roboto Condensed](https://fonts.google.com/specimen/Roboto+Condensed) doivent être disponibles
+dans la session R pour obtenir de meilleurs résultats.
+
 ---
 
 Le matériel de ce dépôt est soumis à la licence

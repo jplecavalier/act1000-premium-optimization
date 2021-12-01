@@ -19,7 +19,7 @@ library(knitr)
 library(xaringanthemer)
 library(ggplot2)
 library(patchwork)
-library(showtext)
+library(extrafont)
 library(scales)
 library(data.table)
 
@@ -37,7 +37,7 @@ opts_chunk$set(
   echo = FALSE,
   message = FALSE, 
   warning = FALSE,
-  fig.show = TRUE,
+  fig.showtext = FALSE,
   fig.align = "center",
   hiline = TRUE
 )
@@ -51,9 +51,6 @@ style_duo(
   text_font_google = google_font("Roboto"),
   header_font_google = google_font("Roboto Condensed")
 )
-
-font_add_google(gsub("'", '', theme_xaringan_get_value("header_font_family")))
-font_add_google(gsub("'", '', theme_xaringan_get_value("text_font_family")))
 
 theme_set(
   theme_minimal(
@@ -135,7 +132,7 @@ data <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_buy) 
 }, id_insured = id_insured, pure_premium = pure_premium, prob_buy = prob_buy, SIMPLIFY = FALSE))]
 
 plot_base <- ggplot(data, aes(x = premium)) +
-  scale_x_continuous(name = expression(pi[i])) +
+  scale_x_continuous(name = expression(π[i])) +
   facet_wrap(
     facets = vars(id_insured),
     ncol = 2L,
@@ -144,13 +141,13 @@ plot_base <- ggplot(data, aes(x = premium)) +
 
 plot_prob_buy <- plot_base +
   geom_line(aes(y = prob_buy)) +
-  scale_y_continuous(name = expression(gamma[i](pi[i]))) +
+  scale_y_continuous(name = expression(γ[i](π[i]))) +
   coord_cartesian(xlim = c(0, 1500)) +
   labs(title = "Probabilité d'achat")
 
 plot_exp_profit <- plot_base +
   geom_line(aes(y = exp_profit)) +
-  scale_y_continuous(name = expression(tilde(p[i])(pi[i])), position = "right") +
+  scale_y_continuous(name = expression(tilde(p[i])(π[i])), position = "right") +
   coord_cartesian(xlim = c(0, 1500), ylim = c(-30, 40)) +
   labs(title = "Profit espéré")
 ```
