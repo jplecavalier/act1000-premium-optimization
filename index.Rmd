@@ -27,6 +27,8 @@ set.seed(20211203L)
 
 options(htmltools.dir.version = FALSE)
 opts_chunk$set(
+  echo = FALSE,
+  fig.path = "img/",
   fig.width = 15,
   fig.height = 100/15,
   fig.retina = 3,
@@ -37,8 +39,7 @@ opts_chunk$set(
   warning = FALSE,
   fig.show = TRUE,
   fig.align = "center",
-  hiline = TRUE,
-  dev.args = list(bg = "transparent")
+  hiline = TRUE
 )
 
 style_duo(
@@ -70,10 +71,19 @@ theme_set(
       line = element_line(
         color = lighten_color(theme_xaringan_get_value("background_color"), 0.1)
       ),
+      plot.background = element_rect(
+        color = NA,
+        fill = theme_xaringan_get_value("background_color")
+      ),
+      plot.margin = margin(10, 10, 10, 10),
       plot.title = element_text(
         size = rel(1.5),
         hjust = 0.5,
         margin = margin(0, 0, 20, 0)
+      ),
+      strip.text = element_text(
+        family = gsub("'", '', theme_xaringan_get_value("header_font_family")),
+        color = theme_xaringan_get_value("header_color")
       ),
       axis.text = NULL,
       panel.grid = NULL,
@@ -96,4 +106,107 @@ update_geom_defaults("point", list(
 update_geom_defaults("line", list(
   color = theme_xaringan_get_value("text_color")
 ))
+```
+
+```{r insured}
+insured <- data.table(id_insured = 1:6)
+insured[, name := paste("Assuré", id_insured)]
+insured[, pure_premium := c(763, 520, 778, 824, 723, 964)]
+insured[, prob_buy := mapply(
+  FUN = function(B, v, Q, M) function(premium) 1 - 1 / (1 + Q * exp(-B * (premium - M))) ^ (1 / v),
+  B = c(0.035, 0.04, 0.02, 0.01, 0.02, 0.025),
+  v = c(0.5, 0.1, 0.92, 0.37, 0.75, 0.68),
+  Q = c(0.5, 0.2, 0.92, 0.45, 0.5, 0.5),
+  M = c(763, 473, 800, 840, 672, 982)
+)]
+
+data <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_buy) {
+  
+  data.table(
+    id_insured = id_insured,
+    premium = 0:1600
+  )[, `:=`(
+    profit = premium - pure_premium,
+    prob_buy = prob_buy(premium)
+  )][, `:=`(
+    exp_profit = prob_buy * profit
+  )]
+  
+}, id_insured = id_insured, pure_premium = pure_premium, prob_buy = prob_buy, SIMPLIFY = FALSE))]
+
+plot_base <- ggplot(data, aes(x = premium)) +
+  scale_x_continuous(name = expression(pi[i])) +
+  facet_wrap(
+    facets = vars(id_insured),
+    ncol = 2L,
+    labeller = as_labeller(insured[, setNames(name, id_insured)])
+  )
+
+plot_prob_buy <- plot_base +
+  geom_line(aes(y = prob_buy)) +
+  scale_y_continuous(name = expression(gamma[i](pi[i]))) +
+  coord_cartesian(xlim = c(0, 1500)) +
+  labs(title = "Probabilité d'achat")
+
+plot_exp_profit <- plot_base +
+  geom_line(aes(y = exp_profit)) +
+  scale_y_continuous(name = expression(tilde(p[i])(pi[i])), position = "right") +
+  coord_cartesian(xlim = c(0, 1500), ylim = c(-30, 40)) +
+  labs(title = "Profit espéré")
+```
+
+```{r ptf}
+opt_premium <- function(pure_premium, prob_buy, lambda) {
+  
+  optimize(
+    f = function(premium) prob_buy(premium) * (premium - pure_premium) + lambda * prob_buy(premium),
+    interval = c(0, 2000),
+    maximum = TRUE
+  )$maximum
+  
+}
+
+data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_buy) {
+  
+  ptf_optim <- data.table(
+    id_ptf = 0:100,
+    id_insured = id_insured,
+    ptf_optim = TRUE,
+    ptf_pp = FALSE,
+    lambda = 0:100
+  )[, `:=`(
+    premium = sapply(lambda, opt_premium, pure_premium = pure_premium, prob_buy = prob_buy)
+  )]
+  
+  ptf_pp <- data.table(
+    id_ptf = 101,
+    id_insured = id_insured,
+    ptf_optim = FALSE,
+    ptf_pp = TRUE,
+    lambda = NA_integer_,
+    premium = pure_premium
+  )
+  
+  ptf_random <- data.table(
+    id_ptf = 102:199,
+    id_insured = id_insured,
+    ptf_optim = FALSE,
+    ptf_pp = FALSE,
+    lambda = NA_integer_
+  )[, `:=`(
+    premium = pure_premium * runif(.N, 0.9, 1.1)
+  )]
+  
+  ptf <- rbindlist(list(ptf_optim, ptf_pp, ptf_random))
+  
+  ptf[, `:=`(
+    profit = premium - pure_premium,
+    prob_buy = prob_buy(premium)
+  )][, `:=`(
+    exp_profit = prob_buy * profit
+  )]
+  
+  ptf[]
+  
+}, id_insured = id_insured, pure_premium = pure_premium, prob_buy = prob_buy, SIMPLIFY = FALSE))]
 ```
