@@ -262,6 +262,21 @@ data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_b
 
 ## Définitions
 
+Soit la constante $\mu_i$ représentant la prime pure du client $i$
+
+Soit la variable $\pi_i$ représentant la prime proposée au client $i$
+
+--
+
+Soit la fonction $p_i \left( \pi_i \right)$ représentant le profit pour le client $i$ où
+$$p_i \left( \pi_i \right) = \pi_i - \mu_i$$
+
+--
+
+Soit la fonction $p_\Sigma \left( \boldsymbol{\pi} \right)$ représentant le profit total du
+portefeuille où
+$$p_\Sigma \left( \boldsymbol{\pi} \right) = \sum\limits_{i = 1}^{n} p_i \left( \pi_i \right)$$
+
 ---
 
 ## Définitions
@@ -273,6 +288,27 @@ plot_profit
 ---
 
 ## Définitions
+
+Soit la fonction $\gamma_i \left( \pi_i \right)$ représentant la probabilité que le client $i$
+accepte l'offre de prime $\pi_i$
+
+--
+
+Soit la fonction $\tilde{p_i} \left( \pi_i \right)$ représentant le profit espéré pour le client $i$
+où
+$$\tilde{p_i} \left( \pi_i \right) = \gamma_i \left( \pi_i \right) * p_i \left( \pi_i \right)$$
+
+--
+
+Soit la fonction $\gamma_\Sigma \left( \boldsymbol{\pi} \right)$ représentant le taux de conversion
+du portefeuille où
+$$\gamma_\Sigma \left( \boldsymbol{\pi} \right) = \frac{\sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n}$$
+
+--
+
+Soit la fonction $\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right)$ représentant le profit total
+espéré du portefeuille où
+$$\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) = \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * p_i \left( \pi_i \right)$$
 
 ---
 
