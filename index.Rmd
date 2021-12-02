@@ -54,7 +54,7 @@ style_duo(
 
 theme_set(
   theme_minimal(
-    base_size = 10L,
+    base_size = 12L,
     base_family = gsub("'", '', theme_xaringan_get_value("text_font_family"))
   ) +
     theme(
@@ -139,6 +139,12 @@ plot_base <- ggplot(data, aes(x = premium)) +
     labeller = as_labeller(insured[, setNames(name, id_insured)])
   )
 
+plot_profit <- plot_base +
+  geom_line(aes(y = profit)) +
+  scale_y_continuous(name = expression(p[i](π[i]))) +
+  coord_cartesian(xlim = c(0, 1500)) +
+  labs(title = "Profit")
+
 plot_prob_buy <- plot_base +
   geom_line(aes(y = prob_buy)) +
   scale_y_continuous(name = expression(γ[i](π[i]))) +
@@ -165,38 +171,84 @@ opt_premium <- function(pure_premium, prob_buy, lambda) {
 
 data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_buy) {
   
-  ptf_optim <- data.table(
-    id_ptf = 0:100,
+  ptf_mean <- data.table(
+    id_ptf = 1L,
     id_insured = id_insured,
-    ptf_optim = TRUE,
+    type = "mean",
+    ptf_ngdt = TRUE,
     ptf_pp = FALSE,
-    lambda = 0:100
-  )[, `:=`(
-    premium = sapply(lambda, opt_premium, pure_premium = pure_premium, prob_buy = prob_buy)
-  )]
+    ptf_optim = FALSE,
+    ptf_random = FALSE,
+    lambda = NA_integer_,
+    premium = insured[, mean(pure_premium)]
+  )
   
   ptf_pp <- data.table(
-    id_ptf = 101,
+    id_ptf = 2L,
     id_insured = id_insured,
-    ptf_optim = FALSE,
+    type = "pure_premium",
+    ptf_ngdt = FALSE,
     ptf_pp = TRUE,
+    ptf_optim = FALSE,
+    ptf_random = FALSE,
     lambda = NA_integer_,
     premium = pure_premium
   )
   
-  ptf_random <- data.table(
-    id_ptf = 102:199,
+  ptf_profitability <- data.table(
+    id_ptf = 3L,
     id_insured = id_insured,
-    ptf_optim = FALSE,
+    type = "profitability",
+    ptf_ngdt = FALSE,
     ptf_pp = FALSE,
+    ptf_optim = TRUE,
+    ptf_random = FALSE,
+    lambda = 0,
+    premium = opt_premium(pure_premium, prob_buy, 0)
+  )
+  
+  ptf_optim <- data.table(
+    id_ptf = 3L + 1:100,
+    id_insured = id_insured,
+    type = "optimal",
+    ptf_ngdt = FALSE,
+    ptf_pp = FALSE,
+    ptf_optim = TRUE,
+    ptf_random = FALSE,
+    lambda = 1:100
+  )[, `:=`(
+    premium = sapply(lambda, opt_premium, pure_premium = pure_premium, prob_buy = prob_buy)
+  )]
+  
+  ptf_growth <- data.table(
+    id_ptf = 104L,
+    id_insured = id_insured,
+    type = "growth",
+    ptf_ngdt = FALSE,
+    ptf_pp = FALSE,
+    ptf_optim = TRUE,
+    ptf_random = FALSE,
+    lambda = Inf,
+    premium = 0
+  )
+  
+  ptf_random <- data.table(
+    id_ptf = 105:205,
+    id_insured = id_insured,
+    type = "random",
+    ptf_ngdt = FALSE,
+    ptf_pp = FALSE,
+    ptf_optim = FALSE,
+    ptf_random = TRUE,
     lambda = NA_integer_
   )[, `:=`(
     premium = pure_premium * runif(.N, 0.9, 1.1)
   )]
   
-  ptf <- rbindlist(list(ptf_optim, ptf_pp, ptf_random))
+  ptf <- rbindlist(list(ptf_mean, ptf_pp, ptf_profitability, ptf_optim, ptf_growth, ptf_random))
   
   ptf[, `:=`(
+    type = factor(type, c("mean", "random", "pure_premium", "profitability", "growth", "optimal")),
     profit = premium - pure_premium,
     prob_buy = prob_buy(premium)
   )][, `:=`(
@@ -206,4 +258,256 @@ data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_b
   ptf[]
   
 }, id_insured = id_insured, pure_premium = pure_premium, prob_buy = prob_buy, SIMPLIFY = FALSE))]
+```
+
+## Définitions
+
+---
+
+## Définitions
+
+```{r definition-1}
+plot_profit
+```
+
+---
+
+## Définitions
+
+---
+
+## Définitions
+
+```{r definition-2}
+plot_prob_buy + plot_exp_profit
+```
+
+---
+
+## Un modèle de prime moyenne
+
+---
+
+## Un modèle de prime moyenne
+
+```{r model-mean}
+scale_mean <- scale_fill_manual(
+  name = NULL,
+  values = c(
+    mean = theme_xaringan_get_value("text_color")
+  ),
+  labels = c("Prime moyenne")
+)
+
+plot_prob_buy_mean <- plot_prob_buy +
+  geom_point(
+    data = data_ptf[type == "mean"],
+    mapping = aes(y = prob_buy, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_mean
+
+plot_exp_profit_mean <- plot_exp_profit +
+  geom_point(
+    data = data_ptf[type == "mean"],
+    mapping = aes(y = exp_profit, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_mean
+
+plot_prob_buy_mean + plot_exp_profit_mean + plot_layout(guides = "collect")
+```
+
+---
+
+## Un modèle de segmentation
+
+---
+
+## Un modèle de segmentation
+
+```{r model-pp}
+scale_pp <- scale_fill_manual(
+  name = NULL,
+  values = c(
+    mean = theme_xaringan_get_value("text_color"),
+    pure_premium = theme_xaringan_get_value("text_bold_color")
+  ),
+  labels = c("Prime moyenne", "Prime pure")
+)
+
+plot_prob_buy_pp <- plot_prob_buy +
+  geom_point(
+    data = data_ptf[type %in% c("mean", "pure_premium")],
+    mapping = aes(y = prob_buy, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_pp
+
+plot_exp_profit_pp <- plot_exp_profit +
+  geom_point(
+    data = data_ptf[type %in% c("mean", "pure_premium")],
+    mapping = aes(y = exp_profit, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_pp
+
+plot_prob_buy_pp + plot_exp_profit_pp + plot_layout(guides = "collect")
+```
+
+---
+
+## Un modèle de rentabilité
+
+---
+
+## Un modèle de rentabilité
+
+```{r model-profitability}
+scale_profitability <- scale_fill_manual(
+  name = NULL,
+  values = c(
+    mean = theme_xaringan_get_value("text_color"),
+    pure_premium = theme_xaringan_get_value("text_bold_color"),
+    profitability = "darkgreen"
+  ),
+  labels = c("Prime moyenne", "Prime pure", "Profit espéré maximum")
+)
+
+plot_prob_buy_profitability <- plot_prob_buy +
+  geom_point(
+    data = data_ptf[type %in% c("mean", "pure_premium", "profitability")],
+    mapping = aes(y = prob_buy, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_profitability
+
+plot_exp_profit_profitability <- plot_exp_profit +
+  geom_point(
+    data = data_ptf[type %in% c("mean", "pure_premium", "profitability")],
+    mapping = aes(y = exp_profit, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_profitability
+
+plot_prob_buy_profitability + plot_exp_profit_profitability + plot_layout(guides = "collect")
+```
+
+---
+
+## Un modèle de croissance
+
+---
+
+## Un modèle de croissance
+
+```{r model-growth}
+scale_growth <- scale_fill_manual(
+  name = NULL,
+  values = c(
+    mean = theme_xaringan_get_value("text_color"),
+    pure_premium = theme_xaringan_get_value("text_bold_color"),
+    profitability = "darkgreen",
+    growth = "darkred"
+  ),
+  labels = c("Prime moyenne", "Prime pure", "Profit espéré maximal", "Croissance maximale")
+)
+
+plot_prob_buy_growth <- plot_prob_buy +
+  geom_point(
+    data = data_ptf[type %in% c("mean", "pure_premium", "profitability", "growth")],
+    mapping = aes(y = prob_buy, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_growth
+
+plot_exp_profit_growth <- plot_exp_profit +
+  geom_point(
+    data = data_ptf[type %in% c("mean", "pure_premium", "profitability", "growth")],
+    mapping = aes(y = exp_profit, fill = type),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  scale_growth
+
+plot_prob_buy_growth + plot_exp_profit_growth + plot_layout(guides = "collect")
+```
+
+---
+
+## Un modèle de croissance rentable
+
+---
+
+## Un modèle de croissance rentable
+
+```{r model-profitable-growth}
+lambda_show <- seq(0L, 100L, 20L)
+
+scale_lambda <- scale_fill_gradient(
+  name = "λ",
+  low = "darkgreen",
+  high = "lightgreen",
+  breaks = lambda_show,
+  guide = guide_legend(
+    nrow = 1L,
+    title.position = "bottom",
+    title.hjust = 0.5,
+    label.position = "bottom"
+  )
+)
+
+plot_prob_buy_profitable_growth <- plot_prob_buy +
+  geom_point(
+    data = data_ptf[lambda %in% lambda_show],
+    mapping = aes(y = prob_buy, fill = lambda),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  geom_point(
+    data = data_ptf[type == "pure_premium"],
+    mapping = aes(y = prob_buy),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color"),
+    fill = theme_xaringan_get_value("text_bold_color")
+  ) +
+  scale_lambda
+
+plot_exp_profit_profitable_growth <- plot_exp_profit +
+  geom_point(
+    data = data_ptf[lambda %in% lambda_show],
+    mapping = aes(y = exp_profit, fill = lambda),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color")
+  ) +
+  geom_point(
+    data = data_ptf[type == "pure_premium"],
+    mapping = aes(y = exp_profit),
+    shape = 21,
+    size = 3,
+    color = theme_xaringan_get_value("text_color"),
+    fill = theme_xaringan_get_value("text_bold_color")
+  ) +
+  scale_lambda
+
+plot_prob_buy_profitable_growth + plot_exp_profit_profitable_growth +
+  plot_layout(guides = "collect")
 ```
