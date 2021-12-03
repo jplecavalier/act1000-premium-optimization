@@ -25,3 +25,33 @@
 .title-slide h3 {
   color: var(--text-color);
 }
+
+/* Tables */
+.remark-slide table {
+  margin: auto;
+  border: none;
+}
+th, td {
+  padding: 5px;
+  background: var(--background-color);
+  min-width: 50px;
+}
+.remark-slide thead, .remark-slide tfoot {
+  background: var(--background-color);
+  color: var(--header-color);
+}
+.remark-slide tr:nth-child(even) {
+  background: var(--background-color);
+}
+
+/* Thanks page */
+.thanks-page {
+  font-size: 36px;
+}
+
+.media-links {
+  font-size: 36px;
+  float: right;
+  vertical-align: middle;
+  border: 5px solid red;
+}

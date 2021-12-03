@@ -13,6 +13,7 @@ output:
       ratio: 16:9
       countIncrementalSlides: false
 ---
+class: inverse center middle
 
 ```{r setup, include=FALSE}
 library(knitr)
@@ -22,6 +23,7 @@ library(patchwork)
 library(extrafont)
 library(scales)
 library(data.table)
+library(fontawesome)
 
 set.seed(20211203L)
 
@@ -98,7 +100,9 @@ update_geom_defaults("col", list(
   fill = theme_xaringan_get_value("text_bold_color")
 ))
 update_geom_defaults("point", list(
-  color = theme_xaringan_get_value("text_color")
+  color = theme_xaringan_get_value("text_color"),
+  shape = 21,
+  size = 3
 ))
 update_geom_defaults("line", list(
   color = theme_xaringan_get_value("text_color")
@@ -149,7 +153,7 @@ plot_prob_buy <- plot_base +
   geom_line(aes(y = prob_buy)) +
   scale_y_continuous(name = expression(γ[i](π[i]))) +
   coord_cartesian(xlim = c(0, 1500)) +
-  labs(title = "Probabilité d'achat")
+  labs(title = "Probabilité de conversion")
 
 plot_exp_profit <- plot_base +
   geom_line(aes(y = exp_profit)) +
@@ -208,20 +212,20 @@ data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_b
   )
   
   ptf_optim <- data.table(
-    id_ptf = 3L + 1:100,
+    id_ptf = 3L + 1:200,
     id_insured = id_insured,
     type = "optimal",
     ptf_ngdt = FALSE,
     ptf_pp = FALSE,
     ptf_optim = TRUE,
     ptf_random = FALSE,
-    lambda = 1:100
+    lambda = 1:200
   )[, `:=`(
     premium = sapply(lambda, opt_premium, pure_premium = pure_premium, prob_buy = prob_buy)
   )]
   
   ptf_growth <- data.table(
-    id_ptf = 104L,
+    id_ptf = 204L,
     id_insured = id_insured,
     type = "growth",
     ptf_ngdt = FALSE,
@@ -233,7 +237,7 @@ data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_b
   )
   
   ptf_random <- data.table(
-    id_ptf = 105:205,
+    id_ptf = 205:305,
     id_insured = id_insured,
     type = "random",
     ptf_ngdt = FALSE,
@@ -260,54 +264,74 @@ data_ptf <- insured[, rbindlist(mapply(function(id_insured, pure_premium, prob_b
 }, id_insured = id_insured, pure_premium = pure_premium, prob_buy = prob_buy, SIMPLIFY = FALSE))]
 ```
 
-## Définitions
-
-Soit la constante $\mu_i$ représentant la prime pure du client $i$
-
-Soit la variable $\pi_i$ représentant la prime proposée au client $i$
+# La promesse d'un assureur
 
 --
 
-Soit la fonction $p_i \left( \pi_i \right)$ représentant le profit pour le client $i$ où
+# Protéger ses assurés en cas de sinistre en échange d'une prime
+
+--
+
+# .
+
+# Comment calculte-t-on cette prime?
+
+---
+
+## Définitions
+
+Soit la constante $\mu_i$ représentant la **prime pure** du client $i$
+
+Soit la variable $\pi_i$ représentant la **prime proposée** au client $i$
+
+--
+
+Soit la fonction $p_i \left( \pi_i \right)$ représentant le **profit** pour le client $i$ où
 $$p_i \left( \pi_i \right) = \pi_i - \mu_i$$
 
---
-
-Soit la fonction $p_\Sigma \left( \boldsymbol{\pi} \right)$ représentant le profit total du
-portefeuille où
-$$p_\Sigma \left( \boldsymbol{\pi} \right) = \sum\limits_{i = 1}^{n} p_i \left( \pi_i \right)$$
-
 ---
 
 ## Définitions
 
-```{r definition-1}
+.pull-left[
+```{r definition-1, fig.width=opts_chunk$get("fig.width")/2L}
 plot_profit
 ```
+]
+
+.pull-right[
+<br><br>
+```{r table-pp}
+kable(insured[, .(
+  `$i$` = id_insured,
+  `$\\mu_i$` = pure_premium
+)], align = "c")
+```
+]
 
 ---
 
 ## Définitions
 
-Soit la fonction $\gamma_i \left( \pi_i \right)$ représentant la probabilité que le client $i$
-accepte l'offre de prime $\pi_i$
+Soit la fonction $\gamma_i \left( \pi_i \right)$ représentant la **probabilité de conversion** du
+client $i$ avec une prime de $\pi_i$
 
 --
 
-Soit la fonction $\tilde{p_i} \left( \pi_i \right)$ représentant le profit espéré pour le client $i$
-où
+Soit la fonction $\tilde{p_i} \left( \pi_i \right)$ représentant le **profit espéré** pour le client
+$i$ où
 $$\tilde{p_i} \left( \pi_i \right) = \gamma_i \left( \pi_i \right) * p_i \left( \pi_i \right)$$
 
 --
 
-Soit la fonction $\gamma_\Sigma \left( \boldsymbol{\pi} \right)$ représentant le taux de conversion
-du portefeuille où
-$$\gamma_\Sigma \left( \boldsymbol{\pi} \right) = \frac{\sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n}$$
+Soit la fonction $\gamma_\Sigma \left( \boldsymbol{\pi} \right)$ représentant le **taux de
+conversion** du portefeuille où
+$$\gamma_\Sigma \left( \boldsymbol{\pi} \right) = \frac{\sum_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n}$$
 
 --
 
-Soit la fonction $\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right)$ représentant le profit total
-espéré du portefeuille où
+Soit la fonction $\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right)$ représentant le **profit total
+espéré** du portefeuille où
 $$\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) = \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * p_i \left( \pi_i \right)$$
 
 ---
@@ -321,6 +345,20 @@ plot_prob_buy + plot_exp_profit
 ---
 
 ## Un modèle de prime moyenne
+
+On cherche les primes optimales $\boldsymbol{\pi^*}$ définies tel que
+$$\boldsymbol{\pi^*} = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,min}} \left( \sum\limits_{i = 1}^{n} \left( \pi_i - \overline{\mu} \right)^2 \right)$$
+
+--
+
+Comme chaque terme de la somme ne touche qu'une dimension à optimiser, on peut réécrire le problème
+comme étant
+$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,min}} \left( \pi_i - \overline{\mu} \right)^2$$
+
+--
+
+On obtient alors
+$$\pi_i^* = \overline{\mu}$$
 
 ---
 
@@ -338,20 +376,14 @@ scale_mean <- scale_fill_manual(
 plot_prob_buy_mean <- plot_prob_buy +
   geom_point(
     data = data_ptf[type == "mean"],
-    mapping = aes(y = prob_buy, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = prob_buy, fill = type)
   ) +
   scale_mean
 
 plot_exp_profit_mean <- plot_exp_profit +
   geom_point(
     data = data_ptf[type == "mean"],
-    mapping = aes(y = exp_profit, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = exp_profit, fill = type)
   ) +
   scale_mean
 
@@ -360,11 +392,82 @@ plot_prob_buy_mean + plot_exp_profit_mean + plot_layout(guides = "collect")
 
 ---
 
-## Un modèle de segmentation
+## Un modèle de prime moyenne
+
+<br>
+```{r model-mean-table}
+table_ptf <- function(data) {
+  
+  data <- copy(data)
+  
+  data[insured, pure_premium := pure_premium, on = .(id_insured)]
+  
+  data <- rbindlist(list(
+    data[, .(
+      id_insured = as.character(id_insured),
+      pure_premium = pure_premium,
+      premium = premium,
+      prob_buy = prob_buy,
+      exp_profit = exp_profit
+    )],
+    data[, .(
+      id_insured = "Total",
+      pure_premium = sum(pure_premium),
+      premium = sum(premium),
+      prob_buy = mean(prob_buy),
+      exp_profit = sum(exp_profit)
+    )]
+  ))[, `:=`(
+    premium = round(premium),
+    prob_buy = round(prob_buy, 2L),
+    exp_profit = round(exp_profit)
+  )]
+  
+  kable(data[, .(
+    `$i$` = id_insured,
+    `$\\mu_i$` = pure_premium,
+    `$\\pi_i^*$` = premium,
+    `$\\gamma_i\\left(\\pi_i^*\\right)$` = prob_buy,
+    `$\\tilde{p_i}\\left(\\pi_i^*\\right)$` = exp_profit
+  )], align = "c")
+  
+}
+
+table_ptf(data_ptf[type == "mean"])
+```
+
+---
+class: inverse center middle
+
+# Conséquences de ce modèle?
+
+--
+
+# .
+
+--
+
+# .
+
+--
+
+### On se fait anti-sélectionner!
 
 ---
 
-## Un modèle de segmentation
+## Un modèle de prime pure
+
+On cherche les primes optimales $\boldsymbol{\pi^*}$ définies tel que
+$$\boldsymbol{\pi^*} = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,min}} \left( \sum\limits_{i = 1}^{n} \left( \pi_i - \mu_i \right)^2 \right)$$
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+$$\pi_i^* = \mu_i$$
+
+---
+
+## Un modèle de prime pure
 
 ```{r model-pp}
 scale_pp <- scale_fill_manual(
@@ -379,20 +482,14 @@ scale_pp <- scale_fill_manual(
 plot_prob_buy_pp <- plot_prob_buy +
   geom_point(
     data = data_ptf[type %in% c("mean", "pure_premium")],
-    mapping = aes(y = prob_buy, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = prob_buy, fill = type)
   ) +
   scale_pp
 
 plot_exp_profit_pp <- plot_exp_profit +
   geom_point(
     data = data_ptf[type %in% c("mean", "pure_premium")],
-    mapping = aes(y = exp_profit, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = exp_profit, fill = type)
   ) +
   scale_pp
 
@@ -401,7 +498,54 @@ plot_prob_buy_pp + plot_exp_profit_pp + plot_layout(guides = "collect")
 
 ---
 
+## Un modèle de prime pure
+
+<br>
+```{r model-pp-table}
+table_ptf(data_ptf[type == "pure_premium"])
+```
+
+---
+class: inverse center middle
+
+# Comment peut-on améliorer ce modèle?
+
+--
+
+# .
+
+--
+
+# .
+
+--
+
+### En changeant la fonction objective à optimiser!
+
+---
+
 ## Un modèle de rentabilité
+
+On cherche les primes optimales $\boldsymbol{\pi^*}$ définies tel que
+$$\begin{align*}
+\boldsymbol{\pi^*} & = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \ \tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) \\
+& = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)
+\end{align*}$$
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \left( \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)$$
+
+--
+
+On dérive l'expression par rapport à $\pi_i$, on égale à 0 et on obtient
+$$\gamma_i^\prime \left(\pi_i^* \right) * \left( \pi_i^* - \mu_i \right) + \gamma_i \left( \pi_i^* \right) = 0$$
+
+--
+
+On pourrait faire une hypothèse supplémentaire sur la forme de $\gamma_i \left( \pi_i \right)$ afin
+d'obtenir $\pi_i^*$ algébriquement, mais on procédera plutôt de manière numérique.
 
 ---
 
@@ -415,26 +559,20 @@ scale_profitability <- scale_fill_manual(
     pure_premium = theme_xaringan_get_value("text_bold_color"),
     profitability = "darkgreen"
   ),
-  labels = c("Prime moyenne", "Prime pure", "Profit espéré maximum")
+  labels = c("Prime moyenne", "Prime pure", "Rentabilité maximale")
 )
 
 plot_prob_buy_profitability <- plot_prob_buy +
   geom_point(
     data = data_ptf[type %in% c("mean", "pure_premium", "profitability")],
-    mapping = aes(y = prob_buy, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = prob_buy, fill = type)
   ) +
   scale_profitability
 
 plot_exp_profit_profitability <- plot_exp_profit +
   geom_point(
     data = data_ptf[type %in% c("mean", "pure_premium", "profitability")],
-    mapping = aes(y = exp_profit, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = exp_profit, fill = type)
   ) +
   scale_profitability
 
@@ -443,7 +581,50 @@ plot_prob_buy_profitability + plot_exp_profit_profitability + plot_layout(guides
 
 ---
 
+## Un modèle de rentabilité
+
+<br>
+```{r model-profitability-table}
+table_ptf(data_ptf[type == "profitability"])
+```
+
+---
+class: inverse center middle
+
+# Pourquoi ce modèle peut-il être inadéquat?
+
+--
+
+# .
+
+--
+
+# .
+
+--
+
+### Parce qu'il ne tient pas compte de la croissance!
+
+---
+
 ## Un modèle de croissance
+
+On cherche les primes optimales $\boldsymbol{\pi^*}$ définies tel que
+$$\begin{align*}
+\boldsymbol{\pi^*} & = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \ \gamma_\Sigma \left( \boldsymbol{\pi} \right) \\
+& = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \frac{\sum_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n} \right)
+\end{align*}$$
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \ \gamma_i \left( \pi_i \right)$$
+
+--
+
+Comme la fonction $\gamma_i \left( \pi_i \right)$ est décroissante sur $\mathbb{R}^+$, on obtient
+directement
+$$\pi_i^* = 0$$
 
 ---
 
@@ -458,26 +639,20 @@ scale_growth <- scale_fill_manual(
     profitability = "darkgreen",
     growth = "darkred"
   ),
-  labels = c("Prime moyenne", "Prime pure", "Profit espéré maximal", "Croissance maximale")
+  labels = c("Prime moyenne", "Prime pure", "Rentabilité maximale", "Croissance maximale")
 )
 
 plot_prob_buy_growth <- plot_prob_buy +
   geom_point(
     data = data_ptf[type %in% c("mean", "pure_premium", "profitability", "growth")],
-    mapping = aes(y = prob_buy, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = prob_buy, fill = type)
   ) +
   scale_growth
 
 plot_exp_profit_growth <- plot_exp_profit +
   geom_point(
     data = data_ptf[type %in% c("mean", "pure_premium", "profitability", "growth")],
-    mapping = aes(y = exp_profit, fill = type),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = exp_profit, fill = type)
   ) +
   scale_growth
 
@@ -486,7 +661,52 @@ plot_prob_buy_growth + plot_exp_profit_growth + plot_layout(guides = "collect")
 
 ---
 
+## Un modèle de croissance
+
+<br>
+```{r model-growth-table}
+table_ptf(data_ptf[type == "growth"])
+```
+
+---
+
+class: inverse center middle
+
+# Rentabilité OU croissance?
+
+--
+
+![](https://media.giphy.com/media/2dff4puq91ieVURkXz/giphy.gif)
+
+--
+
+### On n'a qu'à optimiser les deux en même temps!
+
+---
+
 ## Un modèle de croissance rentable
+
+On cherche les primes optimales $\boldsymbol{\pi^*}$ définies tel que
+$$\begin{align*}
+\boldsymbol{\pi^*} & = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \gamma_\Sigma \left( \boldsymbol{\pi} \right),\ \tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) \right) \\
+& = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \frac{\sum_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n}, \ \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)
+\end{align*}$$
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \left( \gamma_i \left( \pi_i \right), \ \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)$$
+
+--
+
+Il n'y a pas de solution unique à ce problème d'optimisation, on peut le résoudre en fonction d"une
+variable libre $\lambda$ qui représente le compromis entre rentabilité et croissance. On obtient
+alors
+$$\pi_i^* \left( \lambda \right) = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \left( \lambda * \gamma_i \left( \pi_i \right) + \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)$$
+
+--
+
+Encore une fois, on optimise numériquement en fonction de $\lambda$.
 
 ---
 
@@ -511,17 +731,11 @@ scale_lambda <- scale_fill_gradient(
 plot_prob_buy_profitable_growth <- plot_prob_buy +
   geom_point(
     data = data_ptf[lambda %in% lambda_show],
-    mapping = aes(y = prob_buy, fill = lambda),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = prob_buy, fill = lambda)
   ) +
   geom_point(
     data = data_ptf[type == "pure_premium"],
     mapping = aes(y = prob_buy),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color"),
     fill = theme_xaringan_get_value("text_bold_color")
   ) +
   scale_lambda
@@ -529,17 +743,11 @@ plot_prob_buy_profitable_growth <- plot_prob_buy +
 plot_exp_profit_profitable_growth <- plot_exp_profit +
   geom_point(
     data = data_ptf[lambda %in% lambda_show],
-    mapping = aes(y = exp_profit, fill = lambda),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color")
+    mapping = aes(y = exp_profit, fill = lambda)
   ) +
   geom_point(
     data = data_ptf[type == "pure_premium"],
     mapping = aes(y = exp_profit),
-    shape = 21,
-    size = 3,
-    color = theme_xaringan_get_value("text_color"),
     fill = theme_xaringan_get_value("text_bold_color")
   ) +
   scale_lambda
@@ -547,3 +755,98 @@ plot_exp_profit_profitable_growth <- plot_exp_profit +
 plot_prob_buy_profitable_growth + plot_exp_profit_profitable_growth +
   plot_layout(guides = "collect")
 ```
+
+---
+
+## Un modèle de croissance rentable
+
+.pull-left[
+<br>
+$$\lambda = 20$$
+```{r model-profitable-growth-table-20}
+table_ptf(data_ptf[lambda == 20])
+```
+]
+
+.pull-right[
+<br>
+$$\lambda = 80$$
+```{r model-profitable-growth-table-80}
+table_ptf(data_ptf[lambda == 80])
+```
+]
+
+---
+
+## Un modèle de croissance rentable
+
+```{r ptf-profitable-growth}
+data_ptf_summary <- data_ptf[, .(
+  type = unique(type),
+  ptf_optim = unique(ptf_optim),
+  lambda = unique(lambda),
+  prob_buy = mean(prob_buy),
+  exp_profit = sum(exp_profit)
+), id_ptf]
+
+ggplot(mapping = aes(x = exp_profit, y = prob_buy)) +
+  geom_point(
+    data = data_ptf_summary[type == "random"],
+    fill = "black"
+  ) +
+  geom_point(
+    data = data_ptf_summary[type == "pure_premium"],
+    fill = theme_xaringan_get_value("text_bold_color")
+  ) +
+  geom_line(
+    data = data_ptf_summary[ptf_optim == TRUE],
+    linetype = "dashed"
+  ) +
+  geom_point(
+    data = data_ptf_summary[lambda %in% lambda_show],
+    mapping = aes(fill = lambda)
+  ) +
+  scale_x_continuous(name = expression(tilde(p[γ])(π))) +
+  scale_y_continuous(name = expression(γ[Σ](π))) +
+  scale_lambda +
+  coord_cartesian(xlim = c(-90, 90), ylim = c(0.2, 0.7))
+```
+
+---
+class: inverse center middle
+
+# C'est techniquement faisable!
+
+--
+
+#.
+
+# Mais est-ce éthiquement acceptable?
+
+---
+class: thanks-page
+background-image: url(logo.svg)
+background-size: 320px
+background-position: 5% 90%
+
+# Merci!
+
+.pull-right[
+
+<a href="mailto:jplecavalier@me.com">
+  `r fa("paper-plane", fill = theme_xaringan_get_value("text_color"))` jplecavalier@me.com
+</a>
+
+<a href="https://www.linkedin.com/in/jplecavalier/">
+  `r fa("linkedin-in", fill = theme_xaringan_get_value("text_color"))` @jplecavalier
+</a>
+
+<a href="https://jplecavalier.rbind.io/">
+  `r fa("globe", fill = theme_xaringan_get_value("text_color"))` jplecavalier.rbind.io
+</a>
+
+<a href="https://github.com/jplecavalier/act1000-a2021-premium-optimization">
+  `r fa("github", fill = theme_xaringan_get_value("text_color"))` Code source
+</a>
+
+]
