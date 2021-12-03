@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Optimisation de la prime</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J.P. Le Cavalier" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Optimisation de la prime
+## ACT-1000
+### J.P. Le Cavalier
+### 3 décembre 2021
+
+---
+
+class: inverse center middle
+
+
+
+
+
+
+
+# La promesse d'un assureur
+
+--
+
+# Protéger ses assurés en cas de sinistre en échange d'une prime
+
+--
+
+# .
+
+# Comment calculte-t-on cette prime?
+
+---
+
+## Définitions
+
+Soit la constante `\(\mu_i\)` représentant la **prime pure** du client `\(i\)`
+
+Soit la variable `\(\pi_i\)` représentant la **prime proposée** au client `\(i\)`
+
+--
+
+Soit la fonction `\(p_i \left( \pi_i \right)\)` représentant le **profit** pour le client `\(i\)` où
+`$$p_i \left( \pi_i \right) = \pi_i - \mu_i$$`
+
+---
+
+## Définitions
+
+.pull-left[
+&lt;img src="img/definition-1-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;br&gt;&lt;br&gt;
+
+| `\(i\)` | `\(\mu_i\)` |
+|:---:|:-------:|
+|  1  |   763   |
+|  2  |   520   |
+|  3  |   778   |
+|  4  |   824   |
+|  5  |   723   |
+|  6  |   964   |
+]
+
+---
+
+## Définitions
+
+Soit la fonction `\(\gamma_i \left( \pi_i \right)\)` représentant la **probabilité de conversion** du
+client `\(i\)` avec une prime de `\(\pi_i\)`
+
+--
+
+Soit la fonction `\(\tilde{p_i} \left( \pi_i \right)\)` représentant le **profit espéré** pour le client
+`\(i\)` où
+`$$\tilde{p_i} \left( \pi_i \right) = \gamma_i \left( \pi_i \right) * p_i \left( \pi_i \right)$$`
+
+--
+
+Soit la fonction `\(\gamma_\Sigma \left( \boldsymbol{\pi} \right)\)` représentant le **taux de
+conversion** du portefeuille où
+`$$\gamma_\Sigma \left( \boldsymbol{\pi} \right) = \frac{\sum_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n}$$`
+
+--
+
+Soit la fonction `\(\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right)\)` représentant le **profit total
+espéré** du portefeuille où
+`$$\tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) = \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * p_i \left( \pi_i \right)$$`
+
+---
+
+## Définitions
+
+&lt;img src="img/definition-2-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Un modèle de prime moyenne
+
+On cherche les primes optimales `\(\boldsymbol{\pi^*}\)` définies tel que
+`$$\boldsymbol{\pi^*} = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,min}} \left( \sum\limits_{i = 1}^{n} \left( \pi_i - \overline{\mu} \right)^2 \right)$$`
+
+--
+
+Comme chaque terme de la somme ne touche qu'une dimension à optimiser, on peut réécrire le problème
+comme étant
+`$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,min}} \left( \pi_i - \overline{\mu} \right)^2$$`
+
+--
+
+On obtient alors
+`$$\pi_i^* = \overline{\mu}$$`
+
+---
+
+## Un modèle de prime moyenne
+
+&lt;img src="img/model-mean-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Un modèle de prime moyenne
+
+&lt;br&gt;
+
+|  `\(i\)`  | `\(\mu_i\)` | `\(\pi_i^*\)` | `\(\gamma_i\left(\pi_i^*\right)\)` | `\(\tilde{p_i}\left(\pi_i^*\right)\)` |
+|:-----:|:-------:|:---------:|:------------------------------:|:---------------------------------:|
+|   1   |   763   |    762    |              0.57              |                -1                 |
+|   2   |   520   |    762    |              0.00              |                 0                 |
+|   3   |   778   |    762    |              0.69              |                -11                |
+|   4   |   824   |    762    |              0.84              |                -52                |
+|   5   |   723   |    762    |              0.10              |                 4                 |
+|   6   |   964   |    762    |              1.00              |               -202                |
+| Total |  4572   |   4572    |              0.53              |               -262                |
+
+---
+class: inverse center middle
+
+# Conséquences de ce modèle?
+
+--
+
+# .
+
+--
+
+# .
+
+--
+
+### On se fait anti-sélectionner!
+
+---
+
+## Un modèle de prime pure
+
+On cherche les primes optimales `\(\boldsymbol{\pi^*}\)` définies tel que
+`$$\boldsymbol{\pi^*} = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,min}} \left( \sum\limits_{i = 1}^{n} \left( \pi_i - \mu_i \right)^2 \right)$$`
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+`$$\pi_i^* = \mu_i$$`
+
+---
+
+## Un modèle de prime pure
+
+&lt;img src="img/model-pp-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Un modèle de prime pure
+
+&lt;br&gt;
+
+|  `\(i\)`  | `\(\mu_i\)` | `\(\pi_i^*\)` | `\(\gamma_i\left(\pi_i^*\right)\)` | `\(\tilde{p_i}\left(\pi_i^*\right)\)` |
+|:-----:|:-------:|:---------:|:------------------------------:|:---------------------------------:|
+|   1   |   763   |    763    |              0.56              |                 0                 |
+|   2   |   520   |    520    |              0.26              |                 0                 |
+|   3   |   778   |    778    |              0.62              |                 0                 |
+|   4   |   824   |    824    |              0.68              |                 0                 |
+|   5   |   723   |    723    |              0.20              |                 0                 |
+|   6   |   964   |    964    |              0.57              |                 0                 |
+| Total |  4572   |   4572    |              0.48              |                 0                 |
+
+---
+class: inverse center middle
+
+# Comment peut-on améliorer ce modèle?
+
+--
+
+# .
+
+--
+
+# .
+
+--
+
+### En changeant la fonction objective à optimiser!
+
+---
+
+## Un modèle de rentabilité
+
+On cherche les primes optimales `\(\boldsymbol{\pi^*}\)` définies tel que
+`$$\begin{align*}
+\boldsymbol{\pi^*} &amp; = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \ \tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) \\
+&amp; = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)
+\end{align*}$$`
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+`$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \left( \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)$$`
+
+--
+
+On dérive l'expression par rapport à `\(\pi_i\)`, on égale à 0 et on obtient
+`$$\gamma_i^\prime \left(\pi_i^* \right) * \left( \pi_i^* - \mu_i \right) + \gamma_i \left( \pi_i^* \right) = 0$$`
+
+--
+
+On pourrait faire une hypothèse supplémentaire sur la forme de `\(\gamma_i \left( \pi_i \right)\)` afin
+d'obtenir `\(\pi_i^*\)` algébriquement, mais on procédera plutôt de manière numérique.
+
+---
+
+## Un modèle de rentabilité
+
+&lt;img src="img/model-profitability-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Un modèle de rentabilité
+
+&lt;br&gt;
+
+|  `\(i\)`  | `\(\mu_i\)` | `\(\pi_i^*\)` | `\(\gamma_i\left(\pi_i^*\right)\)` | `\(\tilde{p_i}\left(\pi_i^*\right)\)` |
+|:-----:|:-------:|:---------:|:------------------------------:|:---------------------------------:|
+|   1   |   763   |    798    |              0.24              |                 8                 |
+|   2   |   520   |    547    |              0.10              |                 3                 |
+|   3   |   778   |    847    |              0.28              |                20                 |
+|   4   |   824   |    953    |              0.31              |                40                 |
+|   5   |   723   |    777    |              0.08              |                 4                 |
+|   6   |   964   |   1015    |              0.25              |                13                 |
+| Total |  4572   |   4937    |              0.21              |                87                 |
+
+---
+class: inverse center middle
+
+# Pourquoi ce modèle peut-il être inadéquat?
+
+--
+
+# .
+
+--
+
+# .
+
+--
+
+### Parce qu'il ne tient pas compte de la croissance!
+
+---
+
+## Un modèle de croissance
+
+On cherche les primes optimales `\(\boldsymbol{\pi^*}\)` définies tel que
+`$$\begin{align*}
+\boldsymbol{\pi^*} &amp; = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \ \gamma_\Sigma \left( \boldsymbol{\pi} \right) \\
+&amp; = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \frac{\sum_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n} \right)
+\end{align*}$$`
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+`$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \ \gamma_i \left( \pi_i \right)$$`
+
+--
+
+Comme la fonction `\(\gamma_i \left( \pi_i \right)\)` est décroissante sur `\(\mathbb{R}^+\)`, on obtient
+directement
+`$$\pi_i^* = 0$$`
+
+---
+
+## Un modèle de croissance
+
+&lt;img src="img/model-growth-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Un modèle de croissance
+
+&lt;br&gt;
+
+|  `\(i\)`  | `\(\mu_i\)` | `\(\pi_i^*\)` | `\(\gamma_i\left(\pi_i^*\right)\)` | `\(\tilde{p_i}\left(\pi_i^*\right)\)` |
+|:-----:|:-------:|:---------:|:------------------------------:|:---------------------------------:|
+|   1   |   763   |     0     |               1                |               -763                |
+|   2   |   520   |     0     |               1                |               -520                |
+|   3   |   778   |     0     |               1                |               -778                |
+|   4   |   824   |     0     |               1                |               -824                |
+|   5   |   723   |     0     |               1                |               -723                |
+|   6   |   964   |     0     |               1                |               -964                |
+| Total |  4572   |     0     |               1                |               -4572               |
+
+---
+
+class: inverse center middle
+
+# Rentabilité OU croissance?
+
+--
+
+![](https://media.giphy.com/media/2dff4puq91ieVURkXz/giphy.gif)
+
+--
+
+### On n'a qu'à optimiser les deux en même temps!
+
+---
+
+## Un modèle de croissance rentable
+
+On cherche les primes optimales `\(\boldsymbol{\pi^*}\)` définies tel que
+`$$\begin{align*}
+\boldsymbol{\pi^*} &amp; = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \gamma_\Sigma \left( \boldsymbol{\pi} \right),\ \tilde{p_\Sigma} \left( \boldsymbol{\pi} \right) \right) \\
+&amp; = \underset{\boldsymbol{\pi} \, \in \, {\mathbb{R}^+}^n}{\operatorname{arg\,max}} \left( \frac{\sum_{i = 1}^{n} \gamma_i \left( \pi_i \right)}{n}, \ \sum\limits_{i = 1}^{n} \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)
+\end{align*}$$`
+
+--
+
+En utilisant le même argument d'indépendance des termes, on obtient
+`$$\pi_i^* = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \left( \gamma_i \left( \pi_i \right), \ \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)$$`
+
+--
+
+Il n'y a pas de solution unique à ce problème d'optimisation, on peut le résoudre en fonction d"une
+variable libre `\(\lambda\)` qui représente le compromis entre rentabilité et croissance. On obtient
+alors
+`$$\pi_i^* \left( \lambda \right) = \underset{\pi_i \, \in \, \mathbb{R}^+}{\operatorname{arg\,max}} \left( \lambda * \gamma_i \left( \pi_i \right) + \gamma_i \left( \pi_i \right) * \left( \pi_i - \mu_i \right) \right)$$`
+
+--
+
+Encore une fois, on optimise numériquement en fonction de `\(\lambda\)`.
+
+---
+
+## Un modèle de croissance rentable
+
+&lt;img src="img/model-profitable-growth-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Un modèle de croissance rentable
+
+.pull-left[
+&lt;br&gt;
+`$$\lambda = 20$$`
+
+|  `\(i\)`  | `\(\mu_i\)` | `\(\pi_i^*\)` | `\(\gamma_i\left(\pi_i^*\right)\)` | `\(\tilde{p_i}\left(\pi_i^*\right)\)` |
+|:-----:|:-------:|:---------:|:------------------------------:|:---------------------------------:|
+|   1   |   763   |    783    |              0.36              |                 7                 |
+|   2   |   520   |    528    |              0.20              |                 2                 |
+|   3   |   778   |    833    |              0.34              |                19                 |
+|   4   |   824   |    938    |              0.34              |                39                 |
+|   5   |   723   |    758    |              0.11              |                 4                 |
+|   6   |   964   |   1000    |              0.33              |                12                 |
+| Total |  4572   |   4841    |              0.28              |                83                 |
+]
+
+.pull-right[
+&lt;br&gt;
+`$$\lambda = 80$$`
+
+|  `\(i\)`  | `\(\mu_i\)` | `\(\pi_i^*\)` | `\(\gamma_i\left(\pi_i^*\right)\)` | `\(\tilde{p_i}\left(\pi_i^*\right)\)` |
+|:-----:|:-------:|:---------:|:------------------------------:|:---------------------------------:|
+|   1   |   763   |    752    |              0.67              |                -8                 |
+|   2   |   520   |    487    |              0.66              |                -22                |
+|   3   |   778   |    799    |              0.52              |                11                 |
+|   4   |   824   |    898    |              0.46              |                34                 |
+|   5   |   723   |    708    |              0.25              |                -4                 |
+|   6   |   964   |    965    |              0.56              |                 1                 |
+| Total |  4572   |   4608    |              0.52              |                12                 |
+]
+
+---
+
+## Un modèle de croissance rentable
+
+&lt;img src="img/ptf-profitable-growth-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse center middle
+
+# C'est techniquement faisable!
+
+--
+
+#.
+
+# Mais est-ce éthiquement acceptable?
+
+---
+class: thanks-page
+background-image: url(logo.svg)
+background-size: 320px
+background-position: 5% 90%
+
+# Merci!
+
+.pull-right[
+
+&lt;a href="mailto:jplecavalier@me.com"&gt;
+  <svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#FEFEFC;overflow:visible;position:relative;"><path d="M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z"/></svg> jplecavalier@me.com
+&lt;/a&gt;
+
+&lt;a href="https://www.linkedin.com/in/jplecavalier/"&gt;
+  <svg aria-hidden="true" role="img" viewBox="0 0 448 512" style="height:1em;width:0.88em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#FEFEFC;overflow:visible;position:relative;"><path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/></svg> @jplecavalier
+&lt;/a&gt;
+
+&lt;a href="https://jplecavalier.rbind.io/"&gt;
+  <svg aria-hidden="true" role="img" viewBox="0 0 496 512" style="height:1em;width:0.97em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#FEFEFC;overflow:visible;position:relative;"><path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"/></svg> jplecavalier.rbind.io
+&lt;/a&gt;
+
+&lt;a href="https://github.com/jplecavalier/act1000-a2021-premium-optimization"&gt;
+  <svg aria-hidden="true" role="img" viewBox="0 0 496 512" style="height:1em;width:0.97em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#FEFEFC;overflow:visible;position:relative;"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> Code source
+&lt;/a&gt;
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
