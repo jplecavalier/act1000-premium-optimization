@@ -2,7 +2,7 @@
 title: "Optimisation de la prime"
 subtitle: "ACT-1000"
 author: "J.P. Le Cavalier"
-date: "3 décembre 2021"
+date: "13 décembre 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -845,7 +845,7 @@ background-position: 5% 90%
   `r fa("globe", fill = theme_xaringan_get_value("text_color"))` jplecavalier.rbind.io
 </a>
 
-<a href="https://github.com/jplecavalier/act1000-a2021-premium-optimization">
+<a href="https://github.com/jplecavalier/act1000-premium-optimization">
   `r fa("github", fill = theme_xaringan_get_value("text_color"))` Code source
 </a>
 
