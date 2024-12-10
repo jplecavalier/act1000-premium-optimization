@@ -2,7 +2,7 @@
 title: "Optimisation de la prime"
 subtitle: "ACT-1000"
 author: "J.P. Le Cavalier"
-date: "13 décembre 2022"
+date: "10 décembre 2024"
 output:
   xaringan::moon_reader:
     lib_dir: libs

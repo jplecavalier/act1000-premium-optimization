@@ -5,7 +5,9 @@
 <!-- badges: end -->
 
 Ce dépôt contient le matériel de ma présentation sur l'optimisation de la prime dans le cadre du
-cours ACT-1000 du 13 décembre 2022 à l'Université Laval.
+cours ACT-1000 du 10 décembre 2024[^1] à l'Université Laval.
+
+[^1]: La même présentation a été faite aux sessions d'automne 2021 et 2022.
 
 Une version publiée de la présentation est disponible
 [ici](https://jplecavalier.github.io/act1000-premium-optimization/).
